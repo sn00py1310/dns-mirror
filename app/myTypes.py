@@ -8,7 +8,11 @@ class DNSEntry:
     type: Literal["A", "AAAA"]
 
 
-@dataclass(frozen=True, eq=True)
+from dnsProviders import dnsProviderAuth  # noqa: E402
+
+
+@dataclass
 class SyncEntry:
     myDomain: str
+    myDnsProvider: dnsProviderAuth
     externalDomain: str
