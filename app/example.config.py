@@ -1,4 +1,4 @@
-from myTypes import SyncEntry
+from myTypes import SyncEntry, DNSEntryTypes
 from dnsProviders import Cloudflare
 from webhooks import Discord
 
@@ -14,8 +14,9 @@ dns_retry_amount = 2
 dns_lifetime = 15
 
 cf_provider = Cloudflare(zone_identifier="", email="", token="")
+entryTypes = set([DNSEntryTypes.A, DNSEntryTypes.AAAA])
 
 syncMap = [
-    SyncEntry("example.mydomain.test", cf_provider, "example.com"),
-    SyncEntry("example.mydomain.test", cf_provider, "example.com")
+    SyncEntry("example.mydomain.test", cf_provider, "example.com", entryTypes),
+    SyncEntry("example.mydomain.test", cf_provider, "example.com", entryTypes)
 ]

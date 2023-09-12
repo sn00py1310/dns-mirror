@@ -1,11 +1,17 @@
 from dataclasses import dataclass
-from typing import Literal
+from typing import Set
+from enum import StrEnum
+
+
+class DNSEntryTypes(StrEnum):
+    A = "A"
+    AAAA = "AAAA"
 
 
 @dataclass(frozen=True, eq=True)
 class DNSEntry:
     content: str
-    type: Literal["A", "AAAA"]
+    type: DNSEntryTypes
 
 
 from dnsProviders import dnsProviderAuth  # noqa: E402
@@ -16,3 +22,4 @@ class SyncEntry:
     myDomain: str
     myDnsProvider: dnsProviderAuth
     externalDomain: str
+    entryTypes: Set[DNSEntryTypes]

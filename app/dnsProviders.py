@@ -2,9 +2,7 @@ from typing import Set
 import requests
 from abc import abstractmethod, ABCMeta
 
-from myTypes import DNSEntry
-
-ALLOWED_RECORD_TYPES = ["A", "AAAA"]
+from myTypes import DNSEntry, DNSEntryTypes
 
 
 class dnsProviderAuth(metaclass=ABCMeta):
@@ -21,7 +19,7 @@ class dnsProviderAuth(metaclass=ABCMeta):
         raise NotImplementedError
 
     @abstractmethod
-    def getRecordsForDomain(self, myDomain: str) -> Set[DNSEntry]:
+    def getRecordsForDomain(self, myDomain: str, types: Set[DNSEntryTypes]) -> Set[DNSEntry]:
         raise NotImplementedError
 
 
@@ -100,7 +98,7 @@ class Cloudflare(dnsProviderAuth):
         if response.status_code != 200:
             raise Exception(f"Api error\n{response.text}")
 
-    def getRecordsForDomain(self, myDomain: str) -> Set[DNSEntry]:
+    def getRecordsForDomain(self, myDomain: str, types: Set[DNSEntryTypes]) -> Set[DNSEntry]:
         url = f"{self.cf_base_api}/zones/{self.cf_zone_identifier}/dns_records?name={myDomain}"
         response = requests.request("GET", url, headers=self.cf_headers)
         if response.status_code != 200:
@@ -112,7 +110,7 @@ class Cloudflare(dnsProviderAuth):
         domainList: Set[DNSEntry] = set()
 
         for entry in result:
-            if entry["type"] not in ALLOWED_RECORD_TYPES:
+            if entry["type"] not in types:
                 continue
 
             a = DNSEntry(entry["content"], entry["type"])

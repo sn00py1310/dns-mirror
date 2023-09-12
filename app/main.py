@@ -1,14 +1,11 @@
 import dns.resolver
 from dns.resolver import LifetimeTimeout
-from typing import Literal, TypeVar, Set
+from typing import TypeVar, Set
 import config
 import logging
 
-from myTypes import DNSEntry, dnsProviderAuth
+from myTypes import DNSEntry, dnsProviderAuth, DNSEntryTypes
 T = TypeVar("T")
-
-allowedTypes = ["A", "AAAA"]
-
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -24,7 +21,7 @@ def getItemFromSet(i: Set[T]) -> T:
     return next(iter(i))
 
 
-def getRecords(domain: str, type: Literal["A", "AAAA"]) -> list[str]:
+def getRecords(domain: str, type: DNSEntryTypes) -> list[str]:
     dns_retry_counter = 0
     while dns_retry_counter <= config.dns_retry_amount:
         try:
@@ -51,18 +48,16 @@ def getRecords(domain: str, type: Literal["A", "AAAA"]) -> list[str]:
     return list()
 
 
-def updateStuff(myDomain: str, dnsProvider: dnsProviderAuth, externalDomain: str) -> None:
+def updateStuff(myDomain: str, dnsProvider: dnsProviderAuth, externalDomain: str, types: Set[DNSEntryTypes]) -> None:
     log.info(f"{myDomain} -> {externalDomain}")
-    myEntries = dnsProvider.getRecordsForDomain(myDomain)
+    myEntries = dnsProvider.getRecordsForDomain(myDomain, types)
 
     externalEntries: Set[DNSEntry] = set()
-    Records = getRecords(externalDomain, "A")
-    for record in Records:
-        externalEntries.add(DNSEntry(record, "A"))
 
-    Records = getRecords(externalDomain, "AAAA")
-    for record in Records:
-        externalEntries.add(DNSEntry(record, "AAAA"))
+    for type in types:
+        Records = getRecords(externalDomain, type)
+        for record in Records:
+            externalEntries.add(DNSEntry(record, type))
 
     log.debug(f"Same: {myEntries == externalEntries}")
     if myEntries != externalEntries:
@@ -108,7 +103,7 @@ def exceptionNotification(notification: str) -> None:
 def main() -> None:
     for syncEntry in config.syncMap:
         updateStuff(syncEntry.myDomain, syncEntry.myDnsProvider,
-                    syncEntry.externalDomain)
+                    syncEntry.externalDomain, syncEntry.entryTypes)
 
 
 if __name__ == "__main__":
