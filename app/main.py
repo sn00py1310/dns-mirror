@@ -3,6 +3,7 @@ from dns.resolver import LifetimeTimeout
 from typing import TypeVar, Set
 import config
 import logging
+import logging.handlers
 
 from myTypes import DNSEntry, dnsProviderAuth, DNSEntryTypes
 T = TypeVar("T")
@@ -16,6 +17,10 @@ ch = logging.StreamHandler()
 ch.setFormatter(formatter)
 log.addHandler(ch)
 
+fileLogs = logging.handlers.RotatingFileHandler("./logs.log", mode='a', maxBytes=5*1024*1024,
+                                                backupCount=2, encoding=None, delay=False)
+fileLogs.setFormatter(formatter)
+log.addHandler(fileLogs)
 
 def getItemFromSet(i: Set[T]) -> T:
     return next(iter(i))
