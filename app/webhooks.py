@@ -15,3 +15,12 @@ class Discord(Webhook):
 
     def sendNotification(self, message: str) -> None:
         requests.post(self.webhook_url, json={"content": message})
+
+class UptimeMonitor(Webhook):
+    def __init__(self, url: str, msgTemplate: str):
+        self.url = url
+        self.msgTemplate = msgTemplate
+
+    def sendNotification(self, message: str) -> None:
+        url = self.url.replace(self.msgTemplate, message)
+        requests.get(url)

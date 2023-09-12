@@ -1,11 +1,15 @@
 from myTypes import SyncEntry, DNSEntryTypes
 from dnsProviders import Cloudflare
-from webhooks import Discord
+from webhooks import Discord, UptimeMonitor
 
 logLevel = 10
 
-notification_webhooks = [
+error_webhooks = [
     Discord(webhook_id="", webhook_token="")
+]
+
+success_webhooks = [
+    UptimeMonitor("https://uptime.mydomain.test/api/push/XXXXXXXXX?status=up&msg={{msg}}", "{{msg}}")
 ]
 
 dns_servers = ["1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001",

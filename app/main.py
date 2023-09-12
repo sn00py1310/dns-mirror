@@ -96,7 +96,7 @@ def updateStuff(myDomain: str, dnsProvider: dnsProviderAuth, externalDomain: str
 
 
 def exceptionNotification(notification: str) -> None:
-    for webhook in config.notification_webhooks:
+    for webhook in config.error_webhooks:
         webhook.sendNotification(notification)
 
 
@@ -110,6 +110,8 @@ if __name__ == "__main__":
     try:
         log.debug("Startup")
         main()
+        for webhook in config.success_webhooks:
+            webhook.sendNotification("Everything updated")
     except KeyboardInterrupt:
         pass
     except Exception as e:
