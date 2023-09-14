@@ -1,0 +1,11 @@
+{
+    "include": [
+        "app"
+    ],
+    "exclude": [
+        "venv"
+    ],
+    "venvPath": ".",
+    "venv": "venv",
+    "typeCheckingMode": "strict"
+}
